@@ -21,13 +21,13 @@ const Signup = () => {
             });
 
             alert(res.data.message);
-            navigate("/signin");
             setName("");
             setEmail("");
             setPassword("");
+            navigate("/signin");
         }
         catch (err) {
-            alert("Signup failed", err);
+            alert(err.response.data.message);
         }
     }
 

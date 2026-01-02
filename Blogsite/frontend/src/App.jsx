@@ -9,6 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Signup from './pages/Signup'
 import Signin from './pages/Signin'
 import CreateBlog from './pages/CreateBlog'
+import EditBlog from './pages/EditBlog'
 
 const App = () => {
   return (
@@ -32,6 +33,7 @@ const App = () => {
             } />
             <Route path='/contact' element={<Contact />} />
             <Route path='/create-blog' element={<CreateBlog/>}/>
+            <Route path='/editblog/:id' element={<EditBlog/>}/>
           </Route>
         </Routes>
       </BrowserRouter>

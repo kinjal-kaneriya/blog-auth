@@ -1,69 +1,104 @@
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { FaComment, FaEdit, FaTrash } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
 const Home = () => {
+
+  const [post, setPost] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+  const fetchBlogs = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/blog");
+      setPost(res.data); 
+    } catch (err) {
+      alert("Failed to fetch the blog list");
+      console.error(err);
+    }
+  };
+
+  fetchBlogs();
+}, []);
+
+
+  const handleDelete = async (id) => {
+    const confirmMsg = window.confirm("Are you sure you want to delete this blog?");
+    if (!confirmMsg) return;
+
+    try {
+      await axios.delete(`http://localhost:5000/api/blog/${id}`);
+
+      setPost((prevBlogs) =>
+        prevBlogs.filter((blog) => blog._id !== id)
+      );
+
+    } catch (err) {
+      alert("Delete failed");
+      console.error(err);
+    }
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
+    <div className="mt-10 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
+        {post.map((b) => (
+          <div
+            key={b._id}
+            className="relative h-105.5 overflow-hidden shadow-md group"
+          >
+            <img
+              src={b.image}
+              alt="blog"
+              className="w-full h-full object-cover blur-[1.5px] group-hover:blur-0 transition duration-300"
+            />
 
-      {/* Hero Section */}
-      <section className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-black mb-4">
-          Welcome to <span className="text-[#3AABA7]">Mini Blog</span>
-        </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Discover insightful articles, stories, and ideas written by creators
-          around the world.
-        </p>
-      </section>
+            <div className="absolute top-3 right-3 flex gap-2 z-20">
+              <div 
+                onClick={() => navigate(`/editblog/${b._id}`)}
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-white/90 text-black hover:scale-110 transition cursor-pointer"
+              >
+                <FaEdit size={14} />
+              </div>
 
-      {/* Blog Cards */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-8 text-black">
-          Latest Blogs
-        </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          
-          {/* Blog Card */}
-          {[1, 2, 3, 4, 5, 6].map((item) => (
-            <div
-              key={item}
-              className="border border-gray-200 hover:shadow-lg transition"
-            >
-              <div className="h-48 bg-gray-200"></div>
-
-              <div className="p-5">
-                <h3 className="text-lg font-semibold mb-2">
-                  Blog Title Goes Here
-                </h3>
-                <p className="text-gray-600 text-sm mb-4">
-                  This is a short description of the blog post to give users an
-                  idea of the content.
-                </p>
-
-                <div className="flex justify-between items-center text-sm text-gray-500">
-                  <span>Jan 1, 2026</span>
-                  <button className="text-[#3AABA7] font-semibold">
-                    Read More →
-                  </button>
-                </div>
+              <div
+                onClick={() => handleDelete(b._id)}
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-red-500 text-white hover:scale-110 transition cursor-pointer"
+              >
+                <FaTrash size={14} />
               </div>
             </div>
-          ))}
 
-        </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="mt-20 bg-[#3AABA7] text-white text-center py-12">
-        <h2 className="text-3xl font-semibold mb-4">
-          Share Your Story With the World
-        </h2>
-        <p className="mb-6 text-gray-100">
-          Join Mini Blog and start writing today.
-        </p>
-        <button className="bg-white text-[#3AABA7] px-8 py-3 font-semibold">
-          Get Started
-        </button>
-      </section>
+            <div className="absolute inset-0 bg-black/40 flex flex-col justify-end p-4 text-white">
+              <h2 className="text-lg font-semibold mb-2 line-clamp-2">
+                {b.title}
+              </h2>
 
+              <p className="text-sm text-gray-200 mb-3 line-clamp-3">
+                {b.content}
+              </p>
+
+              <div className="flex items-center justify-between text-xs text-gray-300">
+                <span>{new Date(b.createdAt).toDateString()}</span>
+                <FaComment className="text-base cursor-pointer" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex justify-center mt-12">
+  <Link
+    to="/blog"
+    className="px-8 py-3 rounded-full bg-[#3AABA7] text-white font-semibold
+               shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300"
+  >
+    + Create New Blog
+  </Link>
+</div>
     </div>
   );
 };

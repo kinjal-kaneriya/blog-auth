@@ -17,14 +17,16 @@ const Signin = () => {
                 email,
                 password,
             });
-
-            alert(res.data.message);
-            navigate("/create-blog");
-            setEmail("");
-            setPassword("");
+            if(res.data.token) {
+                alert(res.data.message);
+                localStorage.setItem("token", res.data.token);
+                setEmail("");
+                setPassword("");
+                navigate("/");
+            }
         }
         catch (err) {
-            alert("Login failed", err);
+            alert(err.response.data.message);
         }
     }
 
